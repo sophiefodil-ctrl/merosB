@@ -249,7 +249,7 @@ function counts(){
   const c={live:0,hard:0,spelling:0,known:0};
   src.forEach(x=>{if(c[x.pile]!==undefined)c[x.pile]++;});
   cLive.textContent=c.live;cHard.textContent=c.hard;cSpell.textContent=c.spelling;cKnown.textContent=c.known;
-  const scope=themeFilter!==null?`θ.${themeFilter} · ${src.length} cards`:S.cards.length+" cards · v3";
+  const scope=themeFilter!==null?`θ.${themeFilter} · ${src.length} cards`:S.cards.length+" cards · v4";
   tot.textContent=scope;
   fLive.setAttribute("aria-pressed",focus==="live");fHard.setAttribute("aria-pressed",focus==="hard");
   fSpell.setAttribute("aria-pressed",focus==="spelling");fKnown.setAttribute("aria-pressed",focus==="known");
