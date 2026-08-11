@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Μέρος Β</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a2f6b">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --ink:#16232b; --purple:#4a2f6b; --soft:#7c5fa0; --marble:#f0edf6;
+    --paper:#faf9fd; --olive:#6b7a4a; --clay:#a34b32; --saffron:#c98a12;
+    --sea:#1f5f6b; --line:rgba(22,35,43,.14); --r:14px;
+    --serif:Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;background:var(--marble);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  header{display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:12px 16px 10px;border-bottom:1px solid var(--line)}
+  .brand{font-family:var(--serif);font-weight:700;font-size:17px}
+  .brand small{display:block;font-weight:400;font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;opacity:.55;margin-top:2px}
+  .iconbtn{background:none;border:1px solid var(--line);border-radius:999px;padding:8px 13px;
+    font:inherit;font-size:13px;color:var(--ink);cursor:pointer}
+  .piles{display:flex;gap:5px;padding:10px 12px 0}
+  .pile{flex:1;font:inherit;color:inherit;text-align:left;cursor:pointer;border-radius:8px;
+    padding:6px 6px;background:var(--paper);border:1px solid var(--line)}
+  .pile b{display:block;font-family:var(--serif);font-size:17px;line-height:1.1}
+  .pile span{font-size:9px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+  .pile.k{border-bottom:3px solid var(--olive)}
+  .pile.l{border-bottom:3px solid var(--purple)}
+  .pile.h{border-bottom:3px solid var(--clay)}
+  .pile.s{border-bottom:3px solid var(--saffron)}
+  .pile[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .pile[aria-pressed="true"] span{opacity:.8}
+  main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:14px 16px 4px;min-height:0}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:0 1px 0 rgba(22,35,43,.06),0 14px 34px -26px rgba(22,35,43,.9);
+    padding:28px 22px;text-align:center;position:relative;overflow:hidden}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--purple)}
+  .card.hard::before{background:var(--clay)}
+  .card.spelling::before{background:var(--saffron)}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;margin-bottom:10px}
+  .tasktype{display:inline-block;background:var(--purple);color:#fff;border-radius:999px;
+    padding:4px 14px;font-size:12px;letter-spacing:.08em;margin-bottom:16px}
+  .prompt{font-family:var(--serif);font-size:30px;color:var(--purple);line-height:1.25;word-break:break-word}
+  .rule{height:1px;background:var(--line);margin:20px -22px 18px}
+  .answer{font-family:var(--serif);font-size:24px;color:var(--ink);line-height:1.45;word-break:break-word}
+  .tapline{margin-top:22px;font-size:12.5px;opacity:.5}
+  .reveal{width:100%;margin-top:14px;padding:17px;border:none;border-radius:var(--r);
+    background:var(--ink);color:var(--paper);font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+  .grade{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .grade button{padding:15px 6px;border-radius:var(--r);border:1px solid var(--line);background:var(--paper);
+    font:inherit;font-size:13px;font-weight:600;cursor:pointer;line-height:1.25}
+  .grade button small{display:block;font-weight:400;font-size:10.5px;opacity:.6;margin-top:3px}
+  .grade .g1{border-bottom:3px solid var(--olive)}
+  .grade .g2{border-bottom:3px solid var(--purple)}
+  .grade .g3{border-bottom:3px solid var(--clay)}
+  .grade .g4{border-bottom:3px solid var(--saffron)}
+  .grade button:active,.reveal:active{transform:translateY(1px)}
+  .dropline{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .dropline .act{padding:13px 6px;border-radius:var(--r);border:1px solid var(--line);
+    background:transparent;font:inherit;font-size:13px;color:var(--ink);opacity:.85;cursor:pointer}
+  .dropline .act.danger{color:var(--clay)}
+  footer{padding:8px 16px 16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  footer button{background:none;border:none;font:inherit;font-size:12.5px;color:var(--ink);
+    opacity:.6;text-decoration:underline;cursor:pointer;padding:6px}
+  .panel{position:fixed;inset:0;background:var(--marble);z-index:20;display:flex;flex-direction:column;
+    padding:16px;padding-top:calc(16px + env(safe-area-inset-top));overflow:auto}
+  .panel h2{font-family:var(--serif);font-size:19px;margin:0}
+  .panel p{font-size:13.5px;line-height:1.55;opacity:.75;margin:6px 0 12px}
+  .phead{position:sticky;top:-16px;z-index:5;background:var(--marble);margin:-16px -16px 0;
+    padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-bottom:1px solid var(--line)}
+  .phead .close{background:var(--ink);color:var(--paper);border:none;border-radius:999px;
+    padding:10px 16px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+  input[type=text],textarea{width:100%;margin-top:6px;padding:13px;border:1px solid var(--line);
+    border-radius:10px;font:inherit;font-size:15px;background:var(--paper);color:var(--ink)}
+  textarea{min-height:90px;resize:vertical;font-size:14px}
+  input[type=search]{width:100%;margin-top:10px;padding:12px;border:1px solid var(--line);
+    border-radius:10px;font:inherit;font-size:15px;background:var(--paper);color:var(--ink)}
+  label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-top:12px;display:block}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{border:1px solid var(--purple);background:none;border-radius:999px;padding:7px 13px;
+    font:inherit;font-size:13px;color:var(--purple);cursor:pointer}
+  .chip[aria-selected="true"]{background:var(--purple);color:#fff}
+  .row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .row button{flex:1;min-width:120px;padding:14px;border-radius:10px;border:1px solid var(--line);
+    background:var(--paper);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .row button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .list{margin-top:12px;border-top:1px solid var(--line)}
+  .list div{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13px}
+  .list .g{font-family:var(--serif);color:var(--purple);flex:1}
+  .list .tt{font-size:11px;opacity:.6;white-space:nowrap}
+  .list .x{background:none;border:none;color:var(--clay);font-size:17px;cursor:pointer;padding:2px 6px}
+  .list .pen{color:var(--sea)}
+  .tabs{display:flex;gap:6px;margin-top:12px}
+  .tabs button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--paper);
+    font:inherit;font-size:12px;cursor:pointer}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .empty{text-align:center;padding:40px 10px;opacity:.6;font-size:14px;line-height:1.6}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;background:var(--ink);color:var(--paper);
+    padding:11px 18px;border-radius:999px;font-size:13px;z-index:60;opacity:0;transition:opacity .25s}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Μέρος Β<small id="tot">0 cards</small></div>
+  <div style="display:flex;gap:6px">
+    <button class="iconbtn" id="btnWords">Cards</button>
+    <button class="iconbtn" id="btnAdd">Add</button>
+  </div>
+</header>
+<div class="piles">
+  <button class="pile l" id="fLive"><b id="cLive">0</b><span>Live</span></button>
+  <button class="pile h" id="fHard"><b id="cHard">0</b><span>Important</span></button>
+  <button class="pile s" id="fSpell"><b id="cSpell">0</b><span>Spelling</span></button>
+  <button class="pile k" id="fKnown"><b id="cKnown">0</b><span>Known</span></button>
+</div>
+<main><div id="stage"></div></main>
+<footer>
+  <button id="btnShuffle">Reshuffle</button>
+  <button id="btnRestore">Bring back known</button>
+</footer>
+<div class="toast" id="toast"></div>
+<script>
+const KEY="merosB-v1";
+const TASK_TYPES=["αντίθετη σημασία","συνώνυμο","3 τύποι ρήματος","παράγωγο","άλλο"];
+let S={cards:[],seedCount:0};
+let current=null,revealed=false,queue=[],focus=null;
+
+const uid=()=>Math.random().toString(36).slice(2,9);
+function mk(prompt,taskType,answer){
+  return {id:uid(),prompt,taskType,answer,pile:"live",seen:0};
+}
+
+async function readStore(){
+  try{if(window.storage&&window.storage.get){const r=await window.storage.get(KEY);return r&&r.value;}}catch(e){}
+  try{return localStorage.getItem(KEY);}catch(e){}
+  return null;
+}
+async function save(){
+  const v=JSON.stringify(S);
+  try{if(window.storage&&window.storage.set){await window.storage.set(KEY,v);return;}}catch(e){}
+  try{localStorage.setItem(KEY,v);}catch(e){toast("Could not save");}
+}
+
+async function load(){
+  const raw=await readStore();
+  if(raw){try{S=JSON.parse(raw);}catch(e){}}
+  if(!S.cards)S.cards=[];
+  build();render();
+}
+
+function build(){
+  let pool;
+  if(focus)pool=S.cards.filter(c=>c.pile===focus);
+  else{pool=S.cards.filter(c=>c.pile!=="known");pool=pool.concat(pool.filter(c=>c.pile==="hard"));}
+  queue=shuffle(pool);current=queue.shift()||null;
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+function next(){
+  if(!queue.length)build();else current=queue.shift();
+  if(current&&!focus&&current.pile==="known")return next();
+  revealed=false;render();
+}
+function setFocus(p){
+  focus=(focus===p)?null:p;
+  build();revealed=false;render();
+  toast(focus?("Practising "+({hard:"important",live:"live",known:"known",spelling:"spelling"}[focus])+" pile only"):"Practising everything");
+}
+
+const stage=document.getElementById("stage");
+stage.addEventListener("click",e=>{
+  const b=e.target.closest(".act");if(!b||!current)return;
+  if(b.dataset.act==="edit")editCard(current);
+  if(b.dataset.act==="delete")drop(current);
+});
+
+function counts(){
+  const c={live:0,hard:0,spelling:0,known:0};
+  S.cards.forEach(x=>{if(c[x.pile]!==undefined)c[x.pile]++;});
+  cLive.textContent=c.live;cHard.textContent=c.hard;cSpell.textContent=c.spelling;cKnown.textContent=c.known;
+  tot.textContent=S.cards.length+" cards · v1";
+  fLive.setAttribute("aria-pressed",focus==="live");
+  fHard.setAttribute("aria-pressed",focus==="hard");
+  fSpell.setAttribute("aria-pressed",focus==="spelling");
+  fKnown.setAttribute("aria-pressed",focus==="known");
+}
+
+function render(){
+  counts();
+  if(!current||!S.cards.length){
+    stage.innerHTML=`<div class="empty">${S.cards.length?"This pile is empty. Tap it again to practise everything.":"No cards yet.<br>Tap <b>Add</b> to create your first one."}</div>`;
+    return;
+  }
+  const pile=current.pile;
+  stage.innerHTML=`
+    <div class="card ${pile==="hard"?"hard":pile==="spelling"?"spelling":""}">
+      <div class="eyebrow">${focus?"Practising "+({hard:"important",live:"live",known:"known",spelling:"spelling"}[focus])+" only":(pile==="hard"?"Important pile":pile==="spelling"?"Spelling pile":"Live pile")}</div>
+      <div class="tasktype">${esc(current.taskType)}</div>
+      <div class="prompt">${esc(current.prompt)}</div>
+      ${revealed?`<div class="rule"></div><div class="answer">${esc(current.answer).replace(/\n/g,"<br>")}</div>`
+               :`<div class="tapline">Think of the answer, then reveal</div>`}
+    </div>
+    ${revealed?`<div class="grade">
+        <button class="g1" data-p="known">I knew it<small>retire this card</small></button>
+        <button class="g2" data-p="live">Ask me again<small>stay in live pile</small></button>
+        <button class="g3" data-p="hard">Didn't know<small>important pile</small></button>
+        <button class="g4" data-p="spelling">Spelling<small>knew it, wrote it wrong</small></button>
+      </div>
+      <div class="dropline">
+        <button class="act" data-act="edit">Correct this card</button>
+        <button class="act danger" data-act="delete">Delete for good</button>
+      </div>`
+      :`<button class="reveal" id="rv">Show answer</button>`}`;
+  if(!revealed)rv.onclick=()=>{revealed=true;render();};
+  else stage.querySelectorAll(".grade button").forEach(b=>b.onclick=()=>grade(b.dataset.p));
+}
+
+function grade(p){current.pile=p;current.seen++;save();next();}
+function drop(card){
+  S.removed=S.removed||[];S.removed.push(card.id);
+  S.cards=S.cards.filter(c=>c.id!==card.id);
+  queue=queue.filter(c=>c.id!==card.id);
+  save();toast("Deleted");next();
+}
+function esc(s){return(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2400);}
+
+function editCard(card,after){
+  const p=document.createElement("div");p.className="panel";
+  p.innerHTML=`<div class="phead"><h2>Correct this card</h2><button class="close" id="x3">Cancel</button></div>
+    <label>Greek word / phrase</label>
+    <input id="ep" type="text" value="${esc(card.prompt)}">
+    <label>Task type</label>
+    <div class="chips">${TASK_TYPES.map(t=>`<button class="chip${card.taskType===t?' aria-selected-chip':''}" data-t="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+    <input id="ett" type="text" value="${esc(card.taskType)}" placeholder="or type freely">
+    <label>Answer</label>
+    <textarea id="ea">${esc(card.answer)}</textarea>
+    <div class="row"><button class="primary" id="sv">Save</button><button id="cn">Cancel</button></div>`;
+  document.body.appendChild(p);
+  p.querySelectorAll(".chip").forEach(b=>{
+    if(b.dataset.t===card.taskType)b.setAttribute("aria-selected","true");
+    b.onclick=()=>{p.querySelectorAll(".chip").forEach(c=>c.removeAttribute("aria-selected"));
+      b.setAttribute("aria-selected","true");p.querySelector("#ett").value=b.dataset.t;};
+  });
+  const back=()=>{p.remove();if(after)after();else render();};
+  p.querySelector("#cn").onclick=back;p.querySelector("#x3").onclick=back;
+  p.querySelector("#sv").onclick=()=>{
+    const pr=p.querySelector("#ep").value.trim(),tt=p.querySelector("#ett").value.trim(),an=p.querySelector("#ea").value.trim();
+    if(!pr||!tt||!an){toast("All three fields are needed");return;}
+    card.prompt=pr;card.taskType=tt;card.answer=an;
+    save();p.remove();toast("Card corrected");if(after)after();else render();
+  };
+}
+
+document.addEventListener("keydown",e=>{
+  if(document.querySelector(".panel"))return;
+  if(e.code==="Space"||e.key==="Enter"){e.preventDefault();if(!revealed){revealed=true;render();}return;}
+  if(!revealed)return;
+  if(e.key==="1")grade("known");if(e.key==="2")grade("live");
+  if(e.key==="3")grade("hard");if(e.key==="4")grade("spelling");
+});
+
+btnShuffle.onclick=()=>{build();revealed=false;render();toast("Reshuffled");};
+btnRestore.onclick=()=>{S.cards.forEach(c=>{if(c.pile==="known")c.pile="live";});save();build();revealed=false;render();toast("Known cards are back");};
+fLive.onclick=()=>setFocus("live");fHard.onclick=()=>setFocus("hard");
+fSpell.onclick=()=>setFocus("spelling");fKnown.onclick=()=>setFocus("known");
+
+btnAdd.onclick=()=>{
+  let selType=TASK_TYPES[0];
+  const p=document.createElement("div");p.className="panel";
+  p.innerHTML=`<div class="phead"><h2>Add a card</h2><button class="close" id="x2">Back to practice</button></div>
+    <p>Enter the Greek word, choose the task type, and write the answer.</p>
+    <label>Greek word / phrase</label>
+    <input id="ap" type="text" placeholder="φιλική">
+    <label>Task type</label>
+    <div class="chips">${TASK_TYPES.map((t,i)=>`<button class="chip" data-t="${esc(t)}" ${i===0?'aria-selected="true"':'"}>${esc(t)}</button>`).join("")}</div>
+    <input id="att" type="text" value="${esc(TASK_TYPES[0])}" placeholder="or type freely">
+    <label>Answer</label>
+    <textarea id="aa" placeholder="εχθρική"></textarea>
+    <div class="row"><button class="primary" id="imp">Add card</button><button id="cl">Clear</button></div>`;
+  document.body.appendChild(p);
+  p.querySelectorAll(".chip").forEach(b=>{
+    b.onclick=()=>{p.querySelectorAll(".chip").forEach(c=>c.removeAttribute("aria-selected"));
+      b.setAttribute("aria-selected","true");p.querySelector("#att").value=b.dataset.t;selType=b.dataset.t;};
+  });
+  p.querySelector("#x2").onclick=()=>p.remove();
+  p.querySelector("#cl").onclick=()=>{p.querySelector("#ap").value="";p.querySelector("#aa").value="";p.querySelector("#ap").focus();};
+  p.querySelector("#imp").onclick=()=>{
+    const pr=p.querySelector("#ap").value.trim(),tt=p.querySelector("#att").value.trim(),an=p.querySelector("#aa").value.trim();
+    if(!pr||!tt||!an){toast("All three fields are needed");return;}
+    S.cards.push(mk(pr,tt,an));save();
+    p.querySelector("#ap").value="";p.querySelector("#aa").value="";p.querySelector("#ap").focus();
+    toast("Card added — keep going");build();
+  };
+};
+
+btnWords.onclick=()=>{
+  let tab="live",q="";
+  const p=document.createElement("div");p.className="panel";document.body.appendChild(p);
+  const draw=()=>{
+    const rows=S.cards.filter(c=>c.pile===tab&&(!q||
+      (c.prompt+" "+c.answer+" "+c.taskType).toLowerCase().includes(q.toLowerCase()))).slice(0,300);
+    p.innerHTML=`<div class="phead"><h2>My cards</h2><button class="close" id="x1">Back</button></div>
+      <div class="tabs">
+        <button data-t="live" aria-selected="${tab==="live"}">Live</button>
+        <button data-t="hard" aria-selected="${tab==="hard"}">Important</button>
+        <button data-t="spelling" aria-selected="${tab==="spelling"}">Spelling</button>
+        <button data-t="known" aria-selected="${tab==="known"}">Known</button>
+      </div>
+      <input type="search" id="q" placeholder="Search" value="${esc(q)}">
+      <div class="list">${rows.length?rows.map(c=>
+        `<div><span class="g">${esc(c.prompt)}</span><span class="tt">${esc(c.taskType)}</span>
+         <button class="x pen" data-id="${c.id}" title="correct">✎</button>
+         <button class="x" data-id="${c.id}" title="delete">✕</button></div>`).join("")
+        :`<div class="empty">Nothing here.</div>`}</div>
+      <div class="row"><button id="cl2">Back to practice</button></div>`;
+    p.querySelector("#x1").onclick=()=>{p.remove();if(!current)next();else render();};
+    p.querySelector("#cl2").onclick=()=>{p.remove();if(!current)next();else render();};
+    p.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;draw();});
+    p.querySelectorAll(".pen").forEach(b=>b.onclick=ev=>{ev.stopPropagation();
+      const card=S.cards.find(c=>c.id===b.dataset.id);if(card)editCard(card,draw);});
+    p.querySelectorAll(".x:not(.pen)").forEach(b=>b.onclick=()=>{
+      const card=S.cards.find(c=>c.id===b.dataset.id);if(card){drop(card);draw();}});
+    const qi=p.querySelector("#q");
+    qi.oninput=()=>{q=qi.value;const pos=qi.selectionStart;draw();
+      const n=p.querySelector("#q");n.focus();n.setSelectionRange(pos,pos);};
+  };
+  draw();
+};
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+load();
+</script>
+</body>
+</html>
